@@ -23,7 +23,7 @@ const categoryStyles = {
   amarillo: {
     disponible: "border-amarillo-dark bg-amarillo-tint text-yellow-950",
     separado: "border-amarillo-dark bg-amarillo-base text-slate-950",
-    pagado: "border-amarillo-dark bg-amarillo-dark text-slate-950",
+    pagado: "border-amarillo-dark bg-amarillo-dark text-white",
   },
   rojo: {
     disponible: "border-rojo-base bg-rojo-tint text-red-950",
