@@ -1,14 +1,12 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 import { clearLoginAttemptState } from "@/components/auth/login-attempts";
 
 export function SignOutButton() {
-  const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function handleSignOut() {
@@ -22,8 +20,8 @@ export function SignOutButton() {
     }
 
     clearLoginAttemptState();
-    router.replace("/login");
-    router.refresh();
+    window.history.replaceState(null, "", "/login");
+    window.location.reload();
   }
 
   return (
