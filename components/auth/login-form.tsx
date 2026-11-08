@@ -119,7 +119,11 @@ export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
     setSelectedUser(user);
     setPin("");
     setShowPin(false);
-    setErrorMessage(null);
+    setErrorMessage(
+      isLocked && attemptState.lockedUntil
+        ? `Demasiados intentos. Intenta de nuevo en ${formatRemainingTime(attemptState.lockedUntil)} min.`
+        : null,
+    );
   }
 
   function clearSelection() {
@@ -215,12 +219,11 @@ export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
               key={user.id}
               type="button"
               onClick={() => selectUser(user)}
-              disabled={isLocked}
               className={`flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border p-4 transition-colors focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none ${
                 selectedUser?.id === user.id
                   ? "border-blue-700 bg-blue-50 ring-2 ring-blue-200"
                   : "border-slate-200 hover:border-blue-400 hover:bg-slate-50"
-              } disabled:cursor-not-allowed disabled:opacity-60`}
+              }`}
             >
               <span
                 className="flex size-14 items-center justify-center rounded-full text-lg font-bold text-white"
