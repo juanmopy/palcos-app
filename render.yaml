@@ -3,6 +3,7 @@ services:
     name: palcos-app
     runtime: node
     plan: free
+    branch: main
     buildCommand: npm ci && npm run build
     startCommand: npm run start
     healthCheckPath: /login
