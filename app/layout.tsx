@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { InstallAppPrompt } from "@/components/pwa/install-app-prompt";
+import { OfflineProvider } from "@/components/pwa/offline-banner";
 import { Toaster } from "sonner";
 
 import "./globals.css";
@@ -32,8 +33,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es-CO" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
-        {children}
-        <InstallAppPrompt />
+        <OfflineProvider>
+          {children}
+          <InstallAppPrompt />
+        </OfflineProvider>
         <Toaster position="top-right" richColors />
       </body>
     </html>

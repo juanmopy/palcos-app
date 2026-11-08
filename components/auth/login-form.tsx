@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
+import { useOffline } from "@/components/pwa/offline-banner";
 
 export type LoginUser = {
   id: string;
@@ -66,6 +67,7 @@ function formatRemainingTime(lockedUntil: number) {
 
 export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
   const router = useRouter();
+  const { isOffline } = useOffline();
   const pinInputRef = useRef<HTMLInputElement>(null);
   const [selectedUser, setSelectedUser] = useState<LoginUser | null>(null);
   const [pin, setPin] = useState("");
@@ -134,7 +136,12 @@ export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
   }
 
   async function submitPin(pinToSubmit: string) {
-    if (!selectedUser || isSubmitting || pinToSubmit.length !== 6) {
+    if (
+      isOffline ||
+      !selectedUser ||
+      isSubmitting ||
+      pinToSubmit.length !== 6
+    ) {
       return;
     }
 
@@ -279,7 +286,7 @@ export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
                   maxLength={6}
                   value={pin}
                   onChange={(event) => handlePinChange(event.target.value)}
-                  disabled={isSubmitting || isLocked}
+                  disabled={isOffline || isSubmitting || isLocked}
                   aria-describedby={errorMessage ? "login-error" : undefined}
                   className="min-h-12 w-full rounded-lg border border-slate-300 px-4 pr-12 text-center text-2xl tracking-[0.5em] text-slate-950 outline-none placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-700 disabled:bg-slate-100"
                   placeholder="••••••"
@@ -287,7 +294,7 @@ export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
                 <button
                   type="button"
                   onClick={() => setShowPin((visible) => !visible)}
-                  disabled={isSubmitting || isLocked}
+                  disabled={isOffline || isSubmitting || isLocked}
                   aria-label={showPin ? "Ocultar PIN" : "Mostrar PIN"}
                   className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-slate-600 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none"
                 >
