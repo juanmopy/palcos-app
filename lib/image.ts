@@ -1,5 +1,3 @@
-import heic2any from "heic2any";
-
 const MAX_IMAGE_SIDE = 1600;
 
 export async function prepareReceipt(file: File) {
@@ -9,6 +7,7 @@ export async function prepareReceipt(file: File) {
     file.type === "image/heif" ||
     /\.hei[cf]$/i.test(file.name)
   ) {
+    const { default: heic2any } = await import("heic2any");
     const converted = await heic2any({
       blob: file,
       toType: "image/jpeg",
