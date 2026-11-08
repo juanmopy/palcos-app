@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run",
+    "test": "vitest run --exclude tests/a11y.a11y.spec.ts",
+    "test:a11y": "playwright test",
     "db:types": "supabase gen types typescript --linked > lib/database.types.ts"
   },
   "dependencies": {
@@ -34,6 +35,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/postcss": "^4.3.5",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
@@ -42,6 +45,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
     "eslint-config-prettier": "^10.1.8",
+    "playwright": "^1.65.0",
     "prettier": "^3.9.10",
     "supabase": "^3.0.0",
     "tailwindcss": "^4",

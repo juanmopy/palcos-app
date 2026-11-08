@@ -163,9 +163,16 @@ export function PaymentForm({
           }
           className="mt-1 min-h-12 w-full rounded-lg border border-slate-300 px-4 text-base text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           aria-invalid={Boolean(amountError)}
+          aria-describedby={amountError ? "payment-amount-error" : undefined}
         />
         {amountError ? (
-          <span className="mt-1 block text-sm text-red-700">{amountError}</span>
+          <span
+            id="payment-amount-error"
+            className="mt-1 block text-sm text-red-700"
+            aria-live="polite"
+          >
+            {amountError}
+          </span>
         ) : null}
       </label>
 
@@ -206,9 +213,16 @@ export function PaymentForm({
           }
           className="mt-1 min-h-12 w-full rounded-lg border border-slate-300 px-4 text-base text-slate-950 outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           aria-invalid={Boolean(dateError)}
+          aria-describedby={dateError ? "payment-date-error" : undefined}
         />
         {dateError ? (
-          <span className="mt-1 block text-sm text-red-700">{dateError}</span>
+          <span
+            id="payment-date-error"
+            className="mt-1 block text-sm text-red-700"
+            aria-live="polite"
+          >
+            {dateError}
+          </span>
         ) : null}
       </label>
 

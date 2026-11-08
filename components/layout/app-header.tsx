@@ -2,6 +2,7 @@ import { UserCircle } from "lucide-react";
 
 import { ConnectionIndicator } from "@/components/layout/connection-indicator";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { getContrastingTextColor } from "@/lib/color";
 
 type AppHeaderProps = {
   activeUser: {
@@ -31,7 +32,10 @@ export function AppHeader({ activeUser }: AppHeaderProps) {
               <>
                 <span
                   className="flex size-9 items-center justify-center rounded-full text-xs font-bold text-white"
-                  style={{ backgroundColor: activeUser.color_avatar }}
+                  style={{
+                    backgroundColor: activeUser.color_avatar,
+                    color: getContrastingTextColor(activeUser.color_avatar),
+                  }}
                 >
                   {activeUser.iniciales}
                 </span>

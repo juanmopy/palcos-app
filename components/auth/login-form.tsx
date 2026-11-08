@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
+import { getContrastingTextColor } from "@/lib/color";
 import { useOffline } from "@/components/pwa/offline-banner";
 
 export type LoginUser = {
@@ -234,7 +235,10 @@ export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
             >
               <span
                 className="flex size-14 items-center justify-center rounded-full text-lg font-bold text-white"
-                style={{ backgroundColor: user.color_avatar }}
+                style={{
+                  backgroundColor: user.color_avatar,
+                  color: getContrastingTextColor(user.color_avatar),
+                }}
               >
                 {user.iniciales}
               </span>
