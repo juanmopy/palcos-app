@@ -561,6 +561,45 @@ export type Database = {
           email_login: string;
         }[];
       };
+      separar_palco: {
+        Args: {
+          p_palco: number;
+          p_comprador_id: string;
+          p_abono?: Json | null;
+        };
+        Returns: string;
+      };
+      registrar_pago: {
+        Args: {
+          p_pago_id: string;
+          p_comprador_id: string;
+          p_monto: number;
+          p_fecha: string;
+          p_referencia: string | null;
+          p_comprobante_path: string | null;
+          p_nota: string | null;
+          p_aplicaciones: Json;
+        };
+        Returns: string;
+      };
+      anular_pago: {
+        Args: {
+          p_pago_id: string;
+          p_motivo: string;
+        };
+        Returns: undefined;
+      };
+      liberar_palco: {
+        Args: {
+          p_venta_id: string;
+          p_motivo: string;
+          p_devolucion_id: string;
+          p_fecha_devolucion: string;
+          p_referencia: string | null;
+          p_comprobante_path: string | null;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;
