@@ -10,6 +10,18 @@
   --font-sans: Arial, Helvetica, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --font-heading: var(--font-sans);
+  --color-azul-tint: #dbeafe;
+  --color-azul-base: #1d4ed8;
+  --color-azul-dark: #1e3a8a;
+  --color-amarillo-tint: #fef9c3;
+  --color-amarillo-base: #facc15;
+  --color-amarillo-dark: #a16207;
+  --color-rojo-tint: #fee2e2;
+  --color-rojo-base: #dc2626;
+  --color-rojo-dark: #991b1b;
+  --color-verde-tint: #dcfce7;
+  --color-verde-base: #16a34a;
+  --color-verde-dark: #166534;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
