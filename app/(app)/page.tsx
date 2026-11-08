@@ -26,10 +26,30 @@ export default async function MapPage({ searchParams }: MapPageProps) {
 
   let detail: BoxDetailData | null = null;
   if (selectedBox) {
+    const [{ data: buyerOptions }, { data: recommendationRows }] =
+      await Promise.all([
+        supabase
+          .from("compradores")
+          .select("id, nombre, apellido, documento, telefono")
+          .order("nombre"),
+        supabase
+          .from("compradores")
+          .select("recomendado_por")
+          .not("recomendado_por", "is", null),
+      ]);
     detail = {
       box: selectedBox,
       buyer: null,
       payments: [],
+      activeSales: [],
+      reserveBuyers: buyerOptions ?? [],
+      recommendations: [
+        ...new Set(
+          (recommendationRows ?? [])
+            .map((row) => row.recomendado_por?.trim())
+            .filter((value): value is string => Boolean(value)),
+        ),
+      ],
     };
 
     if (selectedBox.venta_id && selectedBox.comprador_id) {
@@ -41,7 +61,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
           .maybeSingle(),
         supabase
           .from("v_palcos")
-          .select("numero")
+          .select("numero, venta_id, saldo")
           .eq("comprador_id", selectedBox.comprador_id)
           .not("venta_id", "is", null)
           .neq("numero", selectedBox.numero),
@@ -86,6 +106,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
         box: selectedBox,
         buyer: buyer
           ? {
+              id: selectedBox.comprador_id,
               name: `${buyer.nombre} ${buyer.apellido}`,
               document: buyer.documento,
               phone: buyer.telefono,
@@ -95,6 +116,35 @@ export default async function MapPage({ searchParams }: MapPageProps) {
                 .filter((number): number is number => number !== null),
             }
           : null,
+        activeSales: [
+          {
+            venta_id: selectedBox.venta_id,
+            palco_numero: selectedBox.numero ?? 0,
+            saldo: selectedBox.saldo ?? 0,
+          },
+          ...(activeBoxes ?? [])
+            .filter(
+              (
+                box,
+              ): box is { numero: number; venta_id: string; saldo: number } =>
+                box.numero !== null &&
+                box.venta_id !== null &&
+                box.saldo !== null,
+            )
+            .map((box) => ({
+              venta_id: box.venta_id,
+              palco_numero: box.numero,
+              saldo: box.saldo,
+            })),
+        ],
+        reserveBuyers: buyerOptions ?? [],
+        recommendations: [
+          ...new Set(
+            (recommendationRows ?? [])
+              .map((row) => row.recomendado_por?.trim())
+              .filter((value): value is string => Boolean(value)),
+          ),
+        ],
         payments: await Promise.all(
           (payments ?? [])
             .filter((payment) => applicationAmounts.has(payment.id))

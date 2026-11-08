@@ -2,7 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import {
+  buyerSchema,
   cancelPaymentSchema,
+  editBuyerSchema,
   registerPaymentSchema,
   releaseBoxSchema,
   separateBoxSchema,
@@ -100,4 +102,53 @@ export async function releaseBox(input: unknown): Promise<ActionResult> {
   });
 
   return rpcError(error);
+}
+
+export async function createBuyer(input: unknown): Promise<ActionResult> {
+  const parsed = buyerSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error);
+  }
+
+  const supabase = await createClient();
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) {
+    return { ok: false, error: "Debes iniciar sesión para crear compradores." };
+  }
+
+  const { data, error } = await supabase
+    .from("compradores")
+    .insert({
+      ...parsed.data,
+      telefono: `+57${parsed.data.telefono}`,
+      recomendado_por: parsed.data.recomendado_por || null,
+      created_by: user.user.id,
+    })
+    .select("id")
+    .single();
+
+  return error ? rpcError(error) : { ok: true, error: null, id: data.id };
+}
+
+export async function editBuyer(input: unknown): Promise<ActionResult> {
+  const parsed = editBuyerSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error);
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("compradores")
+    .update({
+      nombre: parsed.data.nombre,
+      apellido: parsed.data.apellido,
+      documento: parsed.data.documento,
+      telefono: `+57${parsed.data.telefono}`,
+      recomendado_por: parsed.data.recomendado_por || null,
+    })
+    .eq("id", parsed.data.id)
+    .select("id")
+    .single();
+
+  return error ? rpcError(error) : { ok: true, error: null, id: data.id };
 }

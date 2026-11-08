@@ -1,4 +1,6 @@
 import type { VenueBox } from "@/components/map/types";
+import type { AllocationSale } from "@/components/forms/allocation-editor";
+import type { BuyerOption } from "@/components/forms/reserve-form";
 
 export type BoxPayment = {
   id: string;
@@ -15,6 +17,7 @@ export type BoxPayment = {
 export type BoxDetailData = {
   box: VenueBox;
   buyer: {
+    id: string;
     name: string;
     document: string;
     phone: string;
@@ -22,4 +25,7 @@ export type BoxDetailData = {
     otherBoxNumbers: number[];
   } | null;
   payments: BoxPayment[];
+  activeSales: AllocationSale[];
+  reserveBuyers: BuyerOption[];
+  recommendations: string[];
 };
