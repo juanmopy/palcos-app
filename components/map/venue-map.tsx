@@ -287,11 +287,11 @@ export function VenueMap({ boxes, detail }: VenueMapProps) {
             className="overflow-auto rounded-2xl border border-slate-200 bg-slate-100 p-3 shadow-sm sm:p-5"
             style={{ touchAction: "pan-x pan-y pinch-zoom" }}
           >
-            <div className="mx-auto min-w-[690px] max-w-6xl">
+            <div className="mx-auto min-w-0 max-w-6xl lg:min-w-[690px]">
               <div className="mx-auto mb-4 flex h-12 max-w-xs items-center justify-center rounded-xl bg-slate-800 text-sm font-bold uppercase tracking-[0.3em] text-white">
                 Tarima
               </div>
-              <div className="grid grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)] items-stretch gap-2">
+              <div className="hidden grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)] items-stretch gap-2 lg:grid">
                 <div className="space-y-3">
                   {[1, 2, 3].map((level) => (
                     <Block
@@ -321,6 +321,23 @@ export function VenueMap({ boxes, detail }: VenueMapProps) {
                     />
                   ))}
                 </div>
+              </div>
+              <div className="space-y-3 lg:hidden">
+                <div className="rounded-lg border border-dashed border-slate-400 bg-slate-200 px-3 py-2 text-center text-xs font-bold uppercase tracking-widest text-slate-600">
+                  Pasarela · borde{" "}
+                  {mobileSide === "izquierdo" ? "derecho" : "izquierdo"}
+                </div>
+                {[1, 2, 3].map((level) => (
+                  <Block
+                    key={`mobile-${mobileSide}-${level}`}
+                    label={`${mobileSide === "izquierdo" ? "Izquierda" : "Derecha"} · Nivel ${level}`}
+                    boxes={getBlock(mobileSide, level)}
+                    focusedNumber={rovingNumber}
+                    dimmedNumbers={dimmedNumbers}
+                    onBoxClick={openBox}
+                    onBoxKeyDown={handleBoxKeyDown}
+                  />
+                ))}
               </div>
             </div>
           </div>
