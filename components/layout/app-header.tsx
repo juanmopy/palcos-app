@@ -27,11 +27,11 @@ export function AppHeader({ activeUser }: AppHeaderProps) {
 
         <div className="flex items-center gap-3">
           <ConnectionIndicator />
-          <div className="hidden items-center gap-2 sm:flex">
+          <div className="flex min-w-0 items-center gap-2">
             {activeUser ? (
               <>
                 <span
-                  className="flex size-9 items-center justify-center rounded-full text-xs font-bold text-white"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                   style={{
                     backgroundColor: activeUser.color_avatar,
                     color: getContrastingTextColor(activeUser.color_avatar),
@@ -39,7 +39,7 @@ export function AppHeader({ activeUser }: AppHeaderProps) {
                 >
                   {activeUser.iniciales}
                 </span>
-                <span className="max-w-28 truncate text-sm font-medium text-slate-700">
+                <span className="max-w-20 truncate text-xs font-medium text-slate-700 sm:max-w-28 sm:text-sm">
                   {activeUser.nombre}
                 </span>
               </>
@@ -51,7 +51,7 @@ export function AppHeader({ activeUser }: AppHeaderProps) {
               />
             )}
           </div>
-          <div className="hidden lg:block">
+          <div className="block">
             <SignOutButton />
           </div>
         </div>
