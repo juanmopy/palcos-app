@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { AllocationEditor, type AllocationSale } from "./allocation-editor";
 import { ReceiptUploader } from "./receipt-uploader";
+import { ProgressBar } from "@/components/box/progress-bar";
 import { Button } from "@/components/ui/button";
 import { formatCOP, parseCOP } from "@/lib/format";
 import { registerPayment } from "@/lib/actions/box-actions";
@@ -13,6 +14,8 @@ type PaymentFormProps = {
   buyerId: string;
   sales: AllocationSale[];
   initialSaleId: string;
+  currentPaid: number;
+  currentPrice: number;
   onCancel: () => void;
   onSuccess: () => void;
 };
@@ -25,6 +28,8 @@ export function PaymentForm({
   buyerId,
   sales,
   initialSaleId,
+  currentPaid,
+  currentPrice,
   onCancel,
   onSuccess,
 }: PaymentFormProps) {
@@ -165,6 +170,14 @@ export function PaymentForm({
         Nuevo saldo:{" "}
         {formatCOP(Math.max(0, (initialSale?.saldo ?? 0) - amount))}
       </p>
+      <ProgressBar
+        value={
+          currentPrice > 0
+            ? Math.min(100, ((currentPaid + amount) / currentPrice) * 100)
+            : 0
+        }
+        label={`${formatCOP(Math.min(currentPrice, currentPaid + amount))} de ${formatCOP(currentPrice)}`}
+      />
 
       <label className="block">
         <span className="text-sm font-medium text-slate-900">
@@ -219,7 +232,7 @@ export function PaymentForm({
         />
       ) : null}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+      <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white pt-5 sm:flex-row sm:justify-end">
         <Button
           type="button"
           variant="outline"

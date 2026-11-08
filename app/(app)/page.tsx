@@ -107,6 +107,8 @@ export default async function MapPage({ searchParams }: MapPageProps) {
         buyer: buyer
           ? {
               id: selectedBox.comprador_id,
+              firstName: buyer.nombre,
+              lastName: buyer.apellido,
               name: `${buyer.nombre} ${buyer.apellido}`,
               document: buyer.documento,
               phone: buyer.telefono,

@@ -38,6 +38,7 @@ export function ReleaseDialog({
   const [date, setDate] = useState(today);
   const [reference, setReference] = useState("");
   const [receiptPath, setReceiptPath] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -52,10 +53,15 @@ export function ReleaseDialog({
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!reason.trim()) {
-      toast.error("Debes indicar el motivo de la liberación.");
+    if (!reason.trim() || date > today()) {
+      const error = !reason.trim()
+        ? "Debes indicar el motivo de la liberación."
+        : "La fecha de devolución no puede ser futura.";
+      setFieldError(error);
+      toast.error(error);
       return;
     }
+    setFieldError(null);
     setIsSubmitting(true);
     const result = await releaseBox({
       venta_id: saleId,
@@ -100,6 +106,13 @@ export function ReleaseDialog({
             autoFocus={false}
             value={reason}
             onChange={(event) => setReason(event.target.value)}
+            onBlur={() =>
+              setFieldError(
+                !reason.trim()
+                  ? "Debes indicar el motivo de la liberación."
+                  : null,
+              )
+            }
             className="mt-1 min-h-24 w-full rounded-lg border border-slate-300 px-4 py-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-red-700"
           />
         </label>
@@ -113,9 +126,19 @@ export function ReleaseDialog({
             max={today()}
             value={date}
             onChange={(event) => setDate(event.target.value)}
+            onBlur={() =>
+              setFieldError(
+                date > today() ? "La fecha no puede ser futura." : null,
+              )
+            }
             className="mt-1 min-h-12 w-full rounded-lg border border-slate-300 px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-red-700"
           />
         </label>
+        {fieldError ? (
+          <p className="mt-3 text-sm text-red-700" role="alert">
+            {fieldError}
+          </p>
+        ) : null}
         <label className="mt-4 block">
           <span className="text-sm font-medium text-slate-900">
             Referencia de la transferencia

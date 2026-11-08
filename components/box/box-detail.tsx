@@ -38,6 +38,7 @@ export function BoxDetail({ detail }: BoxDetailProps) {
   );
   const [releaseOpen, setReleaseOpen] = useState(false);
   const [cancelPaymentId, setCancelPaymentId] = useState<string | null>(null);
+  const [paymentMenuId, setPaymentMenuId] = useState<string | null>(null);
   const status = (box.estado ?? "disponible") as BoxStatus;
   const price = box.precio ?? 0;
   const paid = box.abonado ?? 0;
@@ -76,6 +77,8 @@ export function BoxDetail({ detail }: BoxDetailProps) {
             buyerId={buyer.id}
             sales={detail.activeSales}
             initialSaleId={box.venta_id ?? ""}
+            currentPaid={box.abonado ?? 0}
+            currentPrice={price}
             onCancel={() => setMode("detail")}
             onSuccess={() => router.refresh()}
           />
@@ -260,13 +263,33 @@ export function BoxDetail({ detail }: BoxDetailProps) {
                             </a>
                           ) : null}
                           {!payment.cancelled ? (
-                            <button
-                              type="button"
-                              onClick={() => setCancelPaymentId(payment.id)}
-                              className="mt-3 block min-h-11 text-sm font-semibold text-red-700 underline focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:outline-none"
-                            >
-                              Anular abono
-                            </button>
+                            <div className="relative mt-3">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setPaymentMenuId((current) =>
+                                    current === payment.id ? null : payment.id,
+                                  )
+                                }
+                                className="flex min-h-11 items-center rounded-lg px-2 text-xl text-slate-600 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none"
+                                aria-label={`Más acciones para el abono del ${formatDate(payment.date)}`}
+                                aria-expanded={paymentMenuId === payment.id}
+                              >
+                                ⋯
+                              </button>
+                              {paymentMenuId === payment.id ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setPaymentMenuId(null);
+                                    setCancelPaymentId(payment.id);
+                                  }}
+                                  className="absolute left-0 top-11 z-10 min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-red-700 shadow-lg"
+                                >
+                                  Anular abono
+                                </button>
+                              ) : null}
+                            </div>
                           ) : null}
                         </article>
                       ))}

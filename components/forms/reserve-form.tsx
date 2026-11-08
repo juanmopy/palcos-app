@@ -222,12 +222,20 @@ export function ReserveForm({
               value={name}
               onChange={setName}
               autoComplete="given-name"
+              onBlur={() =>
+                setError(!name.trim() ? "El nombre es obligatorio." : null)
+              }
             />
             <Field
               label="Apellido *"
               value={lastName}
               onChange={setLastName}
               autoComplete="family-name"
+              onBlur={() =>
+                setError(
+                  !lastName.trim() ? "El apellido es obligatorio." : null,
+                )
+              }
             />
           </div>
           <Field
@@ -235,6 +243,9 @@ export function ReserveForm({
             value={document}
             onChange={(value) => setDocument(value.replace(/\D/g, ""))}
             inputMode="numeric"
+            onBlur={() =>
+              setError(!document.trim() ? "El documento es obligatorio." : null)
+            }
           />
           <Field
             label="Teléfono *"
@@ -245,6 +256,13 @@ export function ReserveForm({
             inputMode="tel"
             type="tel"
             prefix="+57"
+            onBlur={() =>
+              setError(
+                !/^\d{10}$/.test(phone)
+                  ? "El teléfono debe tener 10 dígitos después de +57."
+                  : null,
+              )
+            }
           />
           <label className="block">
             <span className="text-sm font-medium text-slate-900">
@@ -283,6 +301,15 @@ export function ReserveForm({
                 value={depositAmount ? formatCOP(depositAmount) : ""}
                 onChange={(value) => setDepositAmount(parseCOP(value))}
                 inputMode="numeric"
+                onBlur={() =>
+                  setError(
+                    depositAmount <= 0
+                      ? "El monto del abono debe ser mayor que cero."
+                      : depositAmount > price
+                        ? "El abono no puede superar el precio del palco."
+                        : null,
+                  )
+                }
               />
               <p className="text-sm text-slate-600">
                 Saldo después del abono:{" "}
@@ -297,6 +324,13 @@ export function ReserveForm({
                   max={today()}
                   value={depositDate}
                   onChange={(event) => setDepositDate(event.target.value)}
+                  onBlur={() =>
+                    setError(
+                      depositDate > today()
+                        ? "La fecha no puede ser futura."
+                        : null,
+                    )
+                  }
                   className="mt-1 min-h-12 w-full rounded-lg border border-slate-300 px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
                 />
               </label>
@@ -344,7 +378,7 @@ export function ReserveForm({
         </p>
       ) : null}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+      <div className="sticky bottom-0 flex flex-col-reverse gap-3 border-t border-slate-200 bg-white pt-5 sm:flex-row sm:justify-end">
         <Button
           type="button"
           variant="outline"
@@ -392,6 +426,7 @@ function Field({
   inputMode,
   autoComplete,
   prefix,
+  onBlur,
 }: {
   label: string;
   value: string;
@@ -400,6 +435,7 @@ function Field({
   inputMode?: "numeric" | "tel";
   autoComplete?: string;
   prefix?: string;
+  onBlur?: () => void;
 }) {
   return (
     <label className="block">
@@ -416,6 +452,7 @@ function Field({
           autoComplete={autoComplete}
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          onBlur={onBlur}
           className="min-w-0 flex-1 rounded-lg bg-transparent px-4 text-base text-slate-950 outline-none"
         />
       </span>

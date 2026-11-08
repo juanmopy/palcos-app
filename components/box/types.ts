@@ -18,6 +18,8 @@ export type BoxDetailData = {
   box: VenueBox;
   buyer: {
     id: string;
+    firstName: string;
+    lastName: string;
     name: string;
     document: string;
     phone: string;
