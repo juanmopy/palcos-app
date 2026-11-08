@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
+import { clearLoginAttemptState } from "@/components/auth/login-attempts";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export function SignOutButton() {
       return;
     }
 
+    clearLoginAttemptState();
     router.replace("/login");
     router.refresh();
   }

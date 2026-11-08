@@ -7,6 +7,12 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getContrastingTextColor } from "@/lib/color";
 import { useOffline } from "@/components/pwa/offline-banner";
+import {
+  clearLoginAttemptState,
+  readAttemptState,
+  saveAttemptState,
+  type LoginAttemptState,
+} from "@/components/auth/login-attempts";
 
 export type LoginUser = {
   id: string;
@@ -22,45 +28,7 @@ type LoginFormProps = {
   initialErrorMessage: string | null;
 };
 
-type LoginAttemptState = {
-  failedAttempts: number;
-  lockedUntil: number | null;
-};
-
-const ATTEMPTS_STORAGE_KEY = "palcos-login-attempts";
 const LOCKOUT_DURATION_MS = 5 * 60 * 1000;
-
-function readAttemptState(): LoginAttemptState {
-  try {
-    const value = window.localStorage.getItem(ATTEMPTS_STORAGE_KEY);
-    if (!value) {
-      return { failedAttempts: 0, lockedUntil: null };
-    }
-
-    const parsed: unknown = JSON.parse(value);
-    if (
-      typeof parsed !== "object" ||
-      parsed === null ||
-      !("failedAttempts" in parsed) ||
-      typeof parsed.failedAttempts !== "number" ||
-      !("lockedUntil" in parsed) ||
-      (parsed.lockedUntil !== null && typeof parsed.lockedUntil !== "number")
-    ) {
-      return { failedAttempts: 0, lockedUntil: null };
-    }
-
-    return {
-      failedAttempts: parsed.failedAttempts,
-      lockedUntil: parsed.lockedUntil,
-    };
-  } catch {
-    return { failedAttempts: 0, lockedUntil: null };
-  }
-}
-
-function saveAttemptState(state: LoginAttemptState) {
-  window.localStorage.setItem(ATTEMPTS_STORAGE_KEY, JSON.stringify(state));
-}
 
 function formatRemainingTime(lockedUntil: number) {
   return Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
