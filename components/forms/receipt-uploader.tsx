@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { prepareReceipt } from "@/lib/image";
 import { createClient } from "@/lib/supabase/client";
+import { useOffline } from "@/components/pwa/offline-banner";
 
 type ReceiptUploaderProps = {
   paymentId: string;
@@ -18,6 +19,7 @@ export function ReceiptUploader({
   folder = "pagos",
   onUploaded,
 }: ReceiptUploaderProps) {
+  const { isOffline } = useOffline();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -89,7 +91,7 @@ export function ReceiptUploader({
           type="file"
           accept="image/*,application/pdf"
           capture="environment"
-          disabled={isUploading}
+          disabled={isUploading || isOffline}
           onChange={(event) => void handleFileChange(event.target.files?.[0])}
           className="mt-2 block min-h-11 w-full rounded-lg border border-slate-300 p-2 text-base file:mr-3 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:font-semibold file:text-blue-800"
         />

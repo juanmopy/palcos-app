@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { releaseBox } from "@/lib/actions/box-actions";
 import { formatCOP } from "@/lib/format";
 import { conflictMessage, isConflictError } from "@/lib/realtime";
+import { useOffline } from "@/components/pwa/offline-banner";
 
 import { ReceiptUploader } from "./receipt-uploader";
 
@@ -35,6 +36,7 @@ export function ReleaseDialog({
   onSuccess,
 }: ReleaseDialogProps) {
   const router = useRouter();
+  const { isOffline } = useOffline();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const refundId = useMemo(() => crypto.randomUUID(), []);
   const [reason, setReason] = useState("");
@@ -175,7 +177,11 @@ export function ReleaseDialog({
           >
             Cancelar
           </Button>
-          <Button type="submit" variant="destructive" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="destructive"
+            disabled={isSubmitting || isOffline}
+          >
             {isSubmitting
               ? "Guardando..."
               : `Liberar palco ${boxNumber} y devolver ${formatCOP(refundAmount)}`}

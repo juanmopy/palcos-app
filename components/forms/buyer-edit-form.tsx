@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { editBuyer } from "@/lib/actions/box-actions";
+import { useOffline } from "@/components/pwa/offline-banner";
 
 type BuyerEditFormProps = {
   buyer: {
@@ -25,6 +26,7 @@ export function BuyerEditForm({
   onCancel,
   onSuccess,
 }: BuyerEditFormProps) {
+  const { isOffline } = useOffline();
   const [name, setName] = useState(buyer.firstName);
   const [lastName, setLastName] = useState(buyer.lastName);
   const [document, setDocument] = useState(buyer.document);
@@ -114,7 +116,7 @@ export function BuyerEditForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting || isOffline}>
           {isSubmitting ? "Guardando..." : "Guardar cambios"}
         </Button>
       </div>

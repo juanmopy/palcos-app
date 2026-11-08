@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cancelPayment } from "@/lib/actions/box-actions";
 import { conflictMessage, isConflictError } from "@/lib/realtime";
+import { useOffline } from "@/components/pwa/offline-banner";
 
 type CancelPaymentDialogProps = {
   paymentId: string;
@@ -20,6 +21,7 @@ export function CancelPaymentDialog({
   onSuccess,
 }: CancelPaymentDialogProps) {
   const router = useRouter();
+  const { isOffline } = useOffline();
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,7 +73,11 @@ export function CancelPaymentDialog({
           <Button type="button" variant="outline" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" variant="destructive" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="destructive"
+            disabled={isSubmitting || isOffline}
+          >
             {isSubmitting ? "Guardando..." : "Anular abono"}
           </Button>
         </div>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createBuyer, separateBox } from "@/lib/actions/box-actions";
 import { formatCOP, parseCOP } from "@/lib/format";
 import { conflictMessage, isConflictError } from "@/lib/realtime";
+import { useOffline } from "@/components/pwa/offline-banner";
 
 import { ReceiptUploader } from "./receipt-uploader";
 
@@ -43,6 +44,7 @@ export function ReserveForm({
   onSuccess,
 }: ReserveFormProps) {
   const router = useRouter();
+  const { isOffline } = useOffline();
   const paymentId = useMemo(() => crypto.randomUUID(), []);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [search, setSearch] = useState("");
@@ -393,7 +395,7 @@ export function ReserveForm({
           type="button"
           variant="outline"
           onClick={onCancel}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isOffline}
         >
           Cancelar
         </Button>

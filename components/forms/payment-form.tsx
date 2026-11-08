@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { formatCOP, parseCOP } from "@/lib/format";
 import { registerPayment } from "@/lib/actions/box-actions";
 import { conflictMessage, isConflictError } from "@/lib/realtime";
+import { useOffline } from "@/components/pwa/offline-banner";
 
 type PaymentFormProps = {
   buyerId: string;
@@ -36,6 +37,7 @@ export function PaymentForm({
   onSuccess,
 }: PaymentFormProps) {
   const router = useRouter();
+  const { isOffline } = useOffline();
   const paymentId = useMemo(() => crypto.randomUUID(), []);
   const initialSale = sales.find((sale) => sale.venta_id === initialSaleId);
   const [amount, setAmount] = useState(0);
@@ -250,7 +252,7 @@ export function PaymentForm({
         >
           Cancelar
         </Button>
-        <Button type="submit" disabled={!canSubmit}>
+        <Button type="submit" disabled={!canSubmit || isOffline}>
           {isSubmitting ? "Guardando..." : "Registrar abono"}
         </Button>
       </div>
