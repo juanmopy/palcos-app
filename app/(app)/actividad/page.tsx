@@ -20,15 +20,22 @@ function numberValue(value: unknown) {
   return typeof value === "number" ? value : null;
 }
 
-function textFor(action: string, detail: Detail) {
-  const box = typeof detail.palco === "number" ? detail.palco : null;
+function textFor(action: string, detail: Detail, boxes: number[]) {
+  const explicitBox = typeof detail.palco === "number" ? detail.palco : null;
+  const boxText =
+    explicitBox !== null
+      ? ` en el palco ${explicitBox}`
+      : boxes.length
+        ? ` en el palco${boxes.length > 1 ? "s" : ""} ${boxes.join(", ")}`
+        : "";
   const amount =
     numberValue(detail.monto) ?? numberValue(detail.monto_devolucion);
   if (action === "registrar_pago")
-    return `registró un abono${box ? ` en el palco ${box}` : ""}${amount !== null ? ` de ${formatCOP(amount)}` : ""}`;
-  if (action === "separar") return `separó el palco ${box ?? ""}`.trim();
+    return `registró un abono${boxText}${amount !== null ? ` de ${formatCOP(amount)}` : ""}`;
+  if (action === "separar")
+    return `separó el palco ${explicitBox ?? boxes[0] ?? ""}`.trim();
   if (action === "liberar")
-    return `liberó el palco${box ? ` ${box}` : ""}${amount !== null ? ` y registró una devolución de ${formatCOP(amount)}` : ""}`;
+    return `liberó el palco${(explicitBox ?? boxes[0]) ? ` ${explicitBox ?? boxes[0]}` : ""}${amount !== null ? ` y registró una devolución de ${formatCOP(amount)}` : ""}`;
   if (action === "anular_pago")
     return `anuló un abono${typeof detail.motivo === "string" ? `: ${detail.motivo}` : ""}`;
   if (action === "crear_comprador") return "creó un comprador";
@@ -56,6 +63,49 @@ export default async function ActivityPage() {
     : { data: [], error: null };
   if (usersError)
     throw new Error("No se pudieron cargar los usuarios de la actividad.");
+  const saleIds = [
+    ...new Set(
+      (logs ?? [])
+        .filter((log) => log.entidad === "venta")
+        .map((log) => log.entidad_id),
+    ),
+  ];
+  const paymentIds = [
+    ...new Set(
+      (logs ?? [])
+        .filter((log) => log.entidad === "pago")
+        .map((log) => log.entidad_id),
+    ),
+  ];
+  const [
+    { data: sales, error: salesError },
+    { data: applications, error: applicationsError },
+  ] = await Promise.all([
+    saleIds.length
+      ? supabase.from("ventas").select("id, palco_numero").in("id", saleIds)
+      : { data: [], error: null },
+    paymentIds.length
+      ? supabase
+          .from("pago_aplicaciones")
+          .select("pago_id, venta_id")
+          .in("pago_id", paymentIds)
+      : { data: [], error: null },
+  ]);
+  if (salesError || applicationsError) {
+    throw new Error("No se pudieron cargar los palcos de la actividad.");
+  }
+  const boxBySale = new Map(
+    (sales ?? []).map((sale) => [sale.id, sale.palco_numero]),
+  );
+  const boxesByPayment = new Map<string, number[]>();
+  for (const application of applications ?? []) {
+    const box = boxBySale.get(application.venta_id);
+    if (box === undefined) continue;
+    boxesByPayment.set(application.pago_id, [
+      ...(boxesByPayment.get(application.pago_id) ?? []),
+      box,
+    ]);
+  }
   const names = new Map((users ?? []).map((user) => [user.id, user.nombre]));
   const entries: ActivityEntry[] = (logs ?? []).map((log) => {
     const detail = detailValue(log.detalle);
@@ -64,7 +114,15 @@ export default async function ActivityPage() {
       actorId: log.usuario_id,
       actorName: names.get(log.usuario_id ?? "") ?? "Sistema",
       action: log.accion,
-      text: textFor(log.accion, detail),
+      text: textFor(
+        log.accion,
+        detail,
+        log.entidad === "pago"
+          ? (boxesByPayment.get(log.entidad_id) ?? [])
+          : boxBySale.has(log.entidad_id)
+            ? [boxBySale.get(log.entidad_id) ?? 0]
+            : [],
+      ),
       createdAt: log.created_at,
       amount: numberValue(detail.monto) ?? numberValue(detail.monto_devolucion),
     };

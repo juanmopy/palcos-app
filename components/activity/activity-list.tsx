@@ -30,6 +30,15 @@ function relativeTime(value: string) {
   return `hace ${days} día${days === 1 ? "" : "s"}`;
 }
 
+const actionLabels: Record<string, string> = {
+  registrar_pago: "Registrar abono",
+  separar: "Separar palco",
+  liberar: "Liberar palco",
+  anular_pago: "Anular abono",
+  crear_comprador: "Crear comprador",
+  editar_comprador: "Editar comprador",
+};
+
 export function ActivityList({ entries }: { entries: ActivityEntry[] }) {
   const [person, setPerson] = useState("all");
   const [action, setAction] = useState("all");
@@ -78,7 +87,7 @@ export function ActivityList({ entries }: { entries: ActivityEntry[] }) {
             <option value="all">Todas</option>
             {actions.map((item) => (
               <option key={item} value={item}>
-                {item}
+                {actionLabels[item] ?? item}
               </option>
             ))}
           </select>
@@ -97,7 +106,7 @@ export function ActivityList({ entries }: { entries: ActivityEntry[] }) {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm leading-6 text-slate-800">
-                    {entry.text}
+                    <strong>{entry.actorName}</strong> {entry.text}
                   </p>
                   <p
                     className="mt-1 text-xs text-slate-500"
