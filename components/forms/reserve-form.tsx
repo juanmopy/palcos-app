@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { createBuyer, separateBox } from "@/lib/actions/box-actions";
 import { formatCOP, parseCOP } from "@/lib/format";
+import { conflictMessage, isConflictError } from "@/lib/realtime";
 
 import { ReceiptUploader } from "./receipt-uploader";
 
@@ -40,6 +42,7 @@ export function ReserveForm({
   onCancel,
   onSuccess,
 }: ReserveFormProps) {
+  const router = useRouter();
   const paymentId = useMemo(() => crypto.randomUUID(), []);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [search, setSearch] = useState("");
@@ -141,8 +144,9 @@ export function ReserveForm({
       });
       if (!buyerResult.ok || !buyerResult.id) {
         setIsSubmitting(false);
-        setError(buyerResult.error ?? "No se pudo crear el comprador.");
-        toast.error(buyerResult.error ?? "No se pudo crear el comprador.");
+        const message = buyerResult.error ?? "No se pudo crear el comprador.";
+        setError(message);
+        toast.error(message);
         return;
       }
       buyerId = buyerResult.id;
@@ -165,8 +169,14 @@ export function ReserveForm({
     setIsSubmitting(false);
 
     if (!result.ok) {
-      setError(result.error ?? "No se pudo separar el palco.");
-      toast.error(result.error ?? "No se pudo separar el palco.");
+      const message = isConflictError(result.error)
+        ? conflictMessage
+        : (result.error ?? "No se pudo separar el palco.");
+      setError(message);
+      toast.error(message);
+      if (isConflictError(result.error)) {
+        router.refresh();
+      }
       return;
     }
 

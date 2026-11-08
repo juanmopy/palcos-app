@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { releaseBox } from "@/lib/actions/box-actions";
 import { formatCOP } from "@/lib/format";
+import { conflictMessage, isConflictError } from "@/lib/realtime";
 
 import { ReceiptUploader } from "./receipt-uploader";
 
@@ -32,6 +34,7 @@ export function ReleaseDialog({
   onClose,
   onSuccess,
 }: ReleaseDialogProps) {
+  const router = useRouter();
   const cancelRef = useRef<HTMLButtonElement>(null);
   const refundId = useMemo(() => crypto.randomUUID(), []);
   const [reason, setReason] = useState("");
@@ -73,7 +76,13 @@ export function ReleaseDialog({
     });
     setIsSubmitting(false);
     if (!result.ok) {
-      toast.error(result.error ?? "No se pudo liberar el palco.");
+      const message = isConflictError(result.error)
+        ? conflictMessage
+        : (result.error ?? "No se pudo liberar el palco.");
+      toast.error(message);
+      if (isConflictError(result.error)) {
+        router.refresh();
+      }
       return;
     }
     toast.success(`Palco ${boxNumber} liberado.`);

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { cancelPayment } from "@/lib/actions/box-actions";
+import { conflictMessage, isConflictError } from "@/lib/realtime";
 
 type CancelPaymentDialogProps = {
   paymentId: string;
@@ -17,6 +19,7 @@ export function CancelPaymentDialog({
   onClose,
   onSuccess,
 }: CancelPaymentDialogProps) {
+  const router = useRouter();
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,7 +33,13 @@ export function CancelPaymentDialog({
     const result = await cancelPayment({ pago_id: paymentId, motivo: reason });
     setIsSubmitting(false);
     if (!result.ok) {
-      toast.error(result.error ?? "No se pudo anular el abono.");
+      const message = isConflictError(result.error)
+        ? conflictMessage
+        : (result.error ?? "No se pudo anular el abono.");
+      toast.error(message);
+      if (isConflictError(result.error)) {
+        router.refresh();
+      }
       return;
     }
     toast.success("Abono anulado.");

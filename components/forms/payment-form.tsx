@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { AllocationEditor, type AllocationSale } from "./allocation-editor";
@@ -9,6 +10,7 @@ import { ProgressBar } from "@/components/box/progress-bar";
 import { Button } from "@/components/ui/button";
 import { formatCOP, parseCOP } from "@/lib/format";
 import { registerPayment } from "@/lib/actions/box-actions";
+import { conflictMessage, isConflictError } from "@/lib/realtime";
 
 type PaymentFormProps = {
   buyerId: string;
@@ -33,6 +35,7 @@ export function PaymentForm({
   onCancel,
   onSuccess,
 }: PaymentFormProps) {
+  const router = useRouter();
   const paymentId = useMemo(() => crypto.randomUUID(), []);
   const initialSale = sales.find((sale) => sale.venta_id === initialSaleId);
   const [amount, setAmount] = useState(0);
@@ -115,7 +118,13 @@ export function PaymentForm({
     setIsSubmitting(false);
 
     if (!result.ok) {
-      toast.error(result.error ?? "No se pudo registrar el abono.");
+      const message = isConflictError(result.error)
+        ? conflictMessage
+        : (result.error ?? "No se pudo registrar el abono.");
+      toast.error(message);
+      if (isConflictError(result.error)) {
+        router.refresh();
+      }
       return;
     }
 
