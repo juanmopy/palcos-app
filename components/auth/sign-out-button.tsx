@@ -1,0 +1,38 @@
+"use client";
+
+import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { createClient } from "@/lib/supabase/client";
+
+export function SignOutButton() {
+  const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      setIsSigningOut(false);
+      return;
+    }
+
+    router.replace("/login");
+    router.refresh();
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleSignOut}
+      disabled={isSigningOut}
+      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      <LogOut aria-hidden="true" size={18} />
+      {isSigningOut ? "Saliendo..." : "Cambiar de persona / Salir"}
+    </button>
+  );
+}

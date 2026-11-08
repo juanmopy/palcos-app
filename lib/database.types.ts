@@ -372,6 +372,7 @@ export type Database = {
       usuarios: {
         Row: {
           color_avatar: string;
+          email_login: string | null;
           id: string;
           iniciales: string;
           nombre: string;
@@ -379,6 +380,7 @@ export type Database = {
         };
         Insert: {
           color_avatar?: string;
+          email_login?: string | null;
           id: string;
           iniciales: string;
           nombre: string;
@@ -386,6 +388,7 @@ export type Database = {
         };
         Update: {
           color_avatar?: string;
+          email_login?: string | null;
           id?: string;
           iniciales?: string;
           nombre?: string;
@@ -547,7 +550,17 @@ export type Database = {
       };
     };
     Functions: {
-      [_ in never]: never;
+      obtener_usuarios_login: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          id: string;
+          nombre: string;
+          iniciales: string;
+          color_avatar: string;
+          orden: number;
+          email_login: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
