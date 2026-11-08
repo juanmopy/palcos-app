@@ -12,12 +12,15 @@ type RealtimePayload = RealtimePostgresChangesPayload<RealtimeRow>;
 
 function getActorId(payload: RealtimePayload) {
   const row = (payload.new ?? payload.old) as RealtimeRow;
-  const actorKeys = [
-    "separado_por",
-    "liberado_por",
-    "registrado_por",
-    "anulado_por",
-  ];
+  if (payload.table === "ventas") {
+    const key = row.estado === "liberada" ? "liberado_por" : "separado_por";
+    return typeof row[key] === "string" ? row[key] : null;
+  }
+  if (payload.table === "pagos") {
+    const key = row.anulado ? "anulado_por" : "registrado_por";
+    return typeof row[key] === "string" ? row[key] : null;
+  }
+  const actorKeys = ["registrado_por"];
 
   for (const key of actorKeys) {
     if (typeof row[key] === "string") {
@@ -140,7 +143,22 @@ export function RealtimeProvider({
         return;
       }
 
-      const actorId = getActorId(payload);
+      let actorId = getActorId(payload);
+      if (
+        !actorId &&
+        payload.table === "compradores" &&
+        typeof row.id === "string"
+      ) {
+        const { data: log } = await supabase
+          .from("bitacora")
+          .select("usuario_id")
+          .eq("entidad", "comprador")
+          .eq("entidad_id", row.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        actorId = log?.usuario_id ?? null;
+      }
       let actorName = "Otro usuario";
       if (actorId) {
         const { data: actor } = await supabase
