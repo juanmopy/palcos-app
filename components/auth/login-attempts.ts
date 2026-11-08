@@ -51,4 +51,5 @@ export function clearLoginAttemptState() {
   }
 
   window.localStorage.removeItem(ATTEMPTS_STORAGE_KEY);
+  window.dispatchEvent(new Event("palcos-login-state-cleared"));
 }

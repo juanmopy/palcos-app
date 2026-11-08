@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 import { getContrastingTextColor } from "@/lib/color";
 import { useOffline } from "@/components/pwa/offline-banner";
 import {
-  clearLoginAttemptState,
   readAttemptState,
   saveAttemptState,
   type LoginAttemptState,
@@ -61,6 +60,25 @@ export function LoginForm({ users, initialErrorMessage }: LoginFormProps) {
     if (state.lockedUntil && state.lockedUntil <= Date.now()) {
       saveAttemptState({ failedAttempts: 0, lockedUntil: null });
     }
+  }, []);
+
+  useEffect(() => {
+    function handleLoginStateCleared() {
+      setAttemptState({ failedAttempts: 0, lockedUntil: null });
+      setErrorMessage(null);
+      setPin("");
+      setIsSubmitting(false);
+    }
+
+    window.addEventListener(
+      "palcos-login-state-cleared",
+      handleLoginStateCleared,
+    );
+    return () =>
+      window.removeEventListener(
+        "palcos-login-state-cleared",
+        handleLoginStateCleared,
+      );
   }, []);
 
   useEffect(() => {

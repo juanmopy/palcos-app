@@ -24,6 +24,7 @@ describe("login attempt state", () => {
           storage.delete(key);
         },
       },
+      dispatchEvent: () => true,
     } as unknown as Window;
 
     globalThis.window.localStorage.setItem(
@@ -35,7 +36,12 @@ describe("login attempt state", () => {
 
     clearLoginAttemptState();
 
-    expect(readAttemptState()).toEqual({ failedAttempts: 0, lockedUntil: null });
-    expect(globalThis.window.localStorage.getItem(ATTEMPTS_STORAGE_KEY)).toBeNull();
+    expect(readAttemptState()).toEqual({
+      failedAttempts: 0,
+      lockedUntil: null,
+    });
+    expect(
+      globalThis.window.localStorage.getItem(ATTEMPTS_STORAGE_KEY),
+    ).toBeNull();
   });
 });
