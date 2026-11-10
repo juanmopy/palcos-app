@@ -288,7 +288,7 @@ export function VenueMap({ boxes, detail }: VenueMapProps) {
             style={{ touchAction: "pan-x pan-y pinch-zoom" }}
           >
             <div className="mx-auto min-w-0 max-w-6xl lg:min-w-[690px]">
-              <div className="mx-auto mb-4 flex h-12 max-w-xs items-center justify-center rounded-xl bg-slate-800 text-sm font-bold uppercase tracking-[0.3em] text-white">
+              <div className="mx-auto mb-4 flex h-12 w-full items-center justify-center rounded-xl bg-slate-800 text-sm font-bold uppercase tracking-[0.3em] text-white">
                 Tarima
               </div>
               <div className="hidden grid-cols-[minmax(0,1fr)_2.5rem_minmax(0,1fr)] items-stretch gap-2 lg:grid">
