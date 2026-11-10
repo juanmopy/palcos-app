@@ -13,7 +13,7 @@ type BuyerEditFormProps = {
     firstName: string;
     lastName: string;
     name: string;
-    document: string;
+    document: string | null;
     phone: string;
     recommendedBy: string | null;
   };
@@ -29,7 +29,7 @@ export function BuyerEditForm({
   const { isOffline } = useOffline();
   const [name, setName] = useState(buyer.firstName);
   const [lastName, setLastName] = useState(buyer.lastName);
-  const [document, setDocument] = useState(buyer.document);
+  const [document, setDocument] = useState(buyer.document ?? "");
   const [phone, setPhone] = useState(buyer.phone.replace(/^\+57/, ""));
   const [recommendedBy, setRecommendedBy] = useState(buyer.recommendedBy ?? "");
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export function BuyerEditForm({
       id: buyer.id,
       nombre: name,
       apellido: lastName,
-      documento: document,
+      documento: document || null,
       telefono: phone,
       recomendado_por: recommendedBy,
     });
@@ -84,7 +84,7 @@ export function BuyerEditForm({
         }
       />
       <Field
-        label="Documento *"
+        label="Documento (opcional)"
         value={document}
         onChange={setDocument}
         inputMode="numeric"

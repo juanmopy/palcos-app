@@ -106,7 +106,7 @@ export type Database = {
           apellido: string;
           created_at: string;
           created_by: string;
-          documento: string;
+          documento: string | null;
           id: string;
           nombre: string;
           recomendado_por: string | null;
@@ -117,7 +117,7 @@ export type Database = {
           apellido: string;
           created_at?: string;
           created_by: string;
-          documento: string;
+          documento?: string | null;
           id?: string;
           nombre: string;
           recomendado_por?: string | null;
@@ -128,7 +128,7 @@ export type Database = {
           apellido?: string;
           created_at?: string;
           created_by?: string;
-          documento?: string;
+          documento?: string | null;
           id?: string;
           nombre?: string;
           recomendado_por?: string | null;

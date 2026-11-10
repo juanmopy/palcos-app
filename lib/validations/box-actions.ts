@@ -8,8 +8,10 @@ const phoneSchema = z
 const documentSchema = z
   .string()
   .trim()
-  .min(3, "El documento es obligatorio.")
-  .max(30, "El documento es demasiado largo.");
+  .max(30, "El documento es demasiado largo.")
+  .nullable()
+  .optional()
+  .transform((value) => value || null);
 
 export const buyerSchema = z.object({
   nombre: z.string().trim().min(1, "El nombre es obligatorio."),

@@ -120,6 +120,7 @@ export async function createBuyer(input: unknown): Promise<ActionResult> {
     .from("compradores")
     .insert({
       ...parsed.data,
+      documento: parsed.data.documento,
       telefono: `+57${parsed.data.telefono}`,
       recomendado_por: parsed.data.recomendado_por || null,
       created_by: user.user.id,

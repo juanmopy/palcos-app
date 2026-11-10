@@ -16,7 +16,7 @@ export type BuyerOption = {
   id: string;
   nombre: string;
   apellido: string;
-  documento: string;
+  documento: string | null;
   telefono: string;
 };
 
@@ -74,7 +74,7 @@ export function ReserveForm({
     setSelectedBuyerId(buyer.id);
     setName(buyer.nombre);
     setLastName(buyer.apellido);
-    setDocument(buyer.documento);
+    setDocument(buyer.documento ?? "");
     setPhone(buyer.telefono.replace(/^\+57/, ""));
     setError(null);
   }
@@ -91,16 +91,16 @@ export function ReserveForm({
       setError("El teléfono debe tener 10 dígitos después de +57.");
       return false;
     }
-    if (!document.trim()) {
-      setError("El documento es obligatorio.");
-      return false;
-    }
-    const duplicate = buyers.find(
-      (buyer) => buyer.documento === document.trim(),
-    );
-    if (duplicate) {
-      setError("Ese documento ya existe. Selecciona el comprador encontrado.");
-      return false;
+    if (document.trim()) {
+      const duplicate = buyers.find(
+        (buyer) => buyer.documento === document.trim(),
+      );
+      if (duplicate) {
+        setError(
+          "Ese documento ya existe. Selecciona el comprador encontrado.",
+        );
+        return false;
+      }
     }
     return true;
   }
@@ -140,7 +140,7 @@ export function ReserveForm({
       const buyerResult = await createBuyer({
         nombre: name,
         apellido: lastName,
-        documento: document,
+        documento: document || null,
         telefono: phone,
         recomendado_por: recommendedBy,
       });
@@ -222,8 +222,8 @@ export function ReserveForm({
                 >
                   <span className="font-semibold">
                     {buyer.nombre} {buyer.apellido}
-                  </span>{" "}
-                  · {buyer.documento}
+                  </span>
+                  {buyer.documento ? ` · ${buyer.documento}` : ""}
                 </button>
               ))}
             </div>
@@ -251,13 +251,10 @@ export function ReserveForm({
             />
           </div>
           <Field
-            label="Documento *"
+            label="Documento (opcional)"
             value={document}
             onChange={(value) => setDocument(value.replace(/\D/g, ""))}
             inputMode="numeric"
-            onBlur={() =>
-              setError(!document.trim() ? "El documento es obligatorio." : null)
-            }
           />
           <Field
             label="Teléfono *"

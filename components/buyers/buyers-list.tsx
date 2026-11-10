@@ -10,7 +10,7 @@ import { formatCOP } from "@/lib/format";
 export type BuyerListItem = {
   id: string;
   nombre_completo: string;
-  documento: string;
+  documento: string | null;
   telefono: string;
   palcos_activos: number;
   total_precio: number;
@@ -107,7 +107,8 @@ export function BuyersList({ buyers }: { buyers: BuyerListItem[] }) {
                       {buyer.nombre_completo}
                     </h2>
                     <p className="mt-1 text-sm text-slate-600">
-                      {buyer.documento} · {buyer.telefono}
+                      {buyer.documento ? `${buyer.documento} · ` : ""}
+                      {buyer.telefono}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {buyer.palco_numeros.length ? (

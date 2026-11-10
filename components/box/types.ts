@@ -21,7 +21,7 @@ export type BoxDetailData = {
     firstName: string;
     lastName: string;
     name: string;
-    document: string;
+    document: string | null;
     phone: string;
     recommendedBy: string | null;
     otherBoxNumbers: number[];
