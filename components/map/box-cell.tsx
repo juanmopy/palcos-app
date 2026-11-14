@@ -17,7 +17,7 @@ type BoxCellProps = {
 const categoryStyles = {
   azul: {
     disponible: "border-azul-base bg-azul-tint text-blue-950",
-    separado: "border-azul-base bg-azul-base text-white",
+    separado: "border-azul-dark bg-azul-base text-white",
     pagado: "border-azul-dark bg-azul-dark text-white",
   },
   amarillo: {
@@ -27,12 +27,12 @@ const categoryStyles = {
   },
   rojo: {
     disponible: "border-rojo-base bg-rojo-tint text-red-950",
-    separado: "border-rojo-base bg-rojo-base text-white",
+    separado: "border-rojo-dark bg-rojo-base text-white",
     pagado: "border-rojo-dark bg-rojo-dark text-white",
   },
   verde: {
     disponible: "border-verde-base bg-verde-tint text-green-950",
-    separado: "border-verde-base bg-verde-base text-slate-950",
+    separado: "border-verde-dark bg-verde-base text-slate-950",
     pagado: "border-verde-dark bg-verde-dark text-white",
   },
 } as const satisfies Record<string, Record<BoxStatus, string>>;
