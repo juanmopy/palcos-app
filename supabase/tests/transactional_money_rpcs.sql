@@ -18,6 +18,7 @@ declare
   v_monto_mitad bigint;
   v_error text;
   v_devolucion_monto bigint;
+  v_atomic_document text := 'TEST-RPC-ATOMIC';
 begin
   select id into v_usuario_id from public.usuarios order by orden, nombre limit 1;
   if v_usuario_id is null then
@@ -32,6 +33,34 @@ begin
   values
     (v_comprador_id, 'Prueba', 'RPC', 'TEST-RPC-1', '3000000001', v_usuario_id),
     (v_comprador_id_2, 'Prueba', 'RPC Dos', 'TEST-RPC-2', '3000000002', v_usuario_id);
+
+  -- Crear un comprador y separar su palco debe ser una sola operación.
+  begin
+    perform public.separar_palco_con_comprador(
+      4,
+      'Prueba',
+      'Atómica',
+      v_atomic_document,
+      '3000000003',
+      null,
+      jsonb_build_object(
+        'pago_id', gen_random_uuid(),
+        'monto', 999999999,
+        'fecha_pago', current_date
+      )
+    );
+    raise exception 'El test de rollback de comprador no falló.';
+  exception when others then
+    if not exists (
+      select 1
+      from public.compradores
+      where documento = v_atomic_document
+    ) then
+      null;
+    else
+      raise exception 'El comprador huérfano no fue revertido.';
+    end if;
+  end;
 
   select c.precio, c.precio / 2
     into v_precio, v_monto_mitad

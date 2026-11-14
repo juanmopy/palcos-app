@@ -8,6 +8,7 @@ import {
   registerPaymentSchema,
   releaseBoxSchema,
   separateBoxSchema,
+  separateBoxWithNewBuyerSchema,
 } from "@/lib/validations/box-actions";
 
 type ActionResult = {
@@ -39,6 +40,30 @@ export async function separateBox(input: unknown): Promise<ActionResult> {
   const { data, error } = await supabase.rpc("separar_palco", {
     p_palco: parsed.data.palco,
     p_comprador_id: parsed.data.comprador_id,
+    p_abono: parsed.data.abono ?? null,
+  });
+
+  return error
+    ? rpcError(error)
+    : { ok: true, error: null, id: data ?? undefined };
+}
+
+export async function separateBoxWithNewBuyer(
+  input: unknown,
+): Promise<ActionResult> {
+  const parsed = separateBoxWithNewBuyerSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error);
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("separar_palco_con_comprador", {
+    p_palco: parsed.data.palco,
+    p_nombre: parsed.data.comprador.nombre,
+    p_apellido: parsed.data.comprador.apellido,
+    p_documento: parsed.data.comprador.documento ?? null,
+    p_telefono: parsed.data.comprador.telefono,
+    p_recomendado_por: parsed.data.comprador.recomendado_por || null,
     p_abono: parsed.data.abono ?? null,
   });
 

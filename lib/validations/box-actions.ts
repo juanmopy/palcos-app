@@ -36,6 +36,12 @@ export const separateBoxSchema = z.object({
   abono: initialDepositSchema.nullable().optional(),
 });
 
+export const separateBoxWithNewBuyerSchema = z.object({
+  palco: z.number().int().min(1).max(120),
+  comprador: buyerSchema,
+  abono: initialDepositSchema.nullable().optional(),
+});
+
 export const registerPaymentSchema = z.object({
   pago_id: uuidSchema,
   comprador_id: uuidSchema,

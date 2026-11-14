@@ -569,6 +569,18 @@ export type Database = {
         };
         Returns: string;
       };
+      separar_palco_con_comprador: {
+        Args: {
+          p_palco: number;
+          p_nombre: string;
+          p_apellido: string;
+          p_documento: string | null;
+          p_telefono: string;
+          p_recomendado_por: string | null;
+          p_abono?: Json | null;
+        };
+        Returns: string;
+      };
       registrar_pago: {
         Args: {
           p_pago_id: string;

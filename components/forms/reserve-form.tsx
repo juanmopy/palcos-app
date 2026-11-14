@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { createBuyer, separateBox } from "@/lib/actions/box-actions";
+import {
+  separateBox,
+  separateBoxWithNewBuyer,
+} from "@/lib/actions/box-actions";
 import { formatCOP, parseCOP } from "@/lib/format";
 import { conflictMessage, isConflictError } from "@/lib/realtime";
 import { useOffline } from "@/components/pwa/offline-banner";
@@ -134,24 +137,45 @@ export function ReserveForm({
   async function submit() {
     setIsSubmitting(true);
     setError(null);
-    let buyerId = selectedBuyerId;
+    const buyerId = selectedBuyerId;
 
     if (!buyerId) {
-      const buyerResult = await createBuyer({
-        nombre: name,
-        apellido: lastName,
-        documento: document || null,
-        telefono: phone,
-        recomendado_por: recommendedBy,
+      const result = await separateBoxWithNewBuyer({
+        palco,
+        comprador: {
+          nombre: name,
+          apellido: lastName,
+          documento: document || null,
+          telefono: phone,
+          recomendado_por: recommendedBy,
+        },
+        abono: initialDeposit
+          ? {
+              pago_id: paymentId,
+              monto: depositAmount,
+              fecha_pago: depositDate,
+              referencia: depositReference,
+              comprobante_path: receiptPath ?? undefined,
+              nota: depositNote,
+            }
+          : null,
       });
-      if (!buyerResult.ok || !buyerResult.id) {
-        setIsSubmitting(false);
-        const message = buyerResult.error ?? "No se pudo crear el comprador.";
+      setIsSubmitting(false);
+      if (!result.ok) {
+        const message = isConflictError(result.error)
+          ? conflictMessage
+          : (result.error ?? "No se pudo separar el palco.");
         setError(message);
         toast.error(message);
+        if (isConflictError(result.error)) {
+          router.refresh();
+        }
         return;
       }
-      buyerId = buyerResult.id;
+
+      toast.success(`Palco ${palco} separado correctamente.`);
+      onSuccess();
+      return;
     }
 
     const result = await separateBox({
